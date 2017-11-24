@@ -76,3 +76,68 @@ resource "aws_route_table_association" "sample_web" {
     subnet_id = "${aws_subnet.sample_web.id}"
     route_table_id = "${aws_route_table.sample_public.id}"
 }
+
+# Security Groups
+
+resource "aws_security_group" "sample_web" {
+    name = "sample-vpc2:web"
+    vpc_id = "${aws_vpc.sample.id}"
+
+    tags {
+        Name = "sample-vpc2-sg:web"
+    }
+}
+
+resource "aws_security_group_rule" "sample_web_out_all" {
+    security_group_id = "${aws_security_group.sample_web.id}"
+    type = "egress"
+    from_port = 0
+    to_port = 65535
+    protocol = "all"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sample_web_in_ssh" {
+    security_group_id = "${aws_security_group.sample_web.id}"
+    type = "ingress"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sample_web_in_http" {
+    security_group_id = "${aws_security_group.sample_web.id}"
+    type = "ingress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group" "sample_db" {
+    name = "sample-vpc2:db"
+    vpc_id = "${aws_vpc.sample.id}"
+
+    tags {
+        Name = "sample-vpc2-sg:db"
+    }
+}
+
+resource "aws_security_group_rule" "sample_db_out_all" {
+    security_group_id = "${aws_security_group.sample_db.id}"
+    type = "egress"
+    from_port = 0
+    to_port = 65535
+    protocol = "all"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sample_db_in_mysql" {
+    security_group_id = "${aws_security_group.sample_db.id}"
+    type = "ingress"
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.sample_web.id}"
+}
