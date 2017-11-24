@@ -141,3 +141,13 @@ resource "aws_security_group_rule" "sample_db_in_mysql" {
     protocol = "tcp"
     source_security_group_id = "${aws_security_group.sample_web.id}"
 }
+
+# DB
+
+resource "aws_db_subnet_group" "sample_db_group" {
+    name = "sample-vpc2-db-sbg"
+    subnet_ids = [
+        "${aws_subnet.sample_db1.id}",
+        "${aws_subnet.sample_db2.id}"
+    ]
+}
